@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+#  from datetime import datetime
+from django.utils import timezone
+from django.urls import reverse  # Used to generate URLs by reversing the URL patterns
 
 
 class Category(models.Model):
@@ -24,9 +27,16 @@ class Question(models.Model):
     contributor = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.IntegerField(default=0, help_text="Rate the question")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, help_text="Choose category")
+    date = models.DateTimeField('date published', default=timezone.localtime)
 
     def __str__(self):
         return self.subject
+
+    def get_absolute_url(self):
+        """
+        Returns the url of the detailed page for the question
+        """
+        return reverse('qa:answer', args=[str(self.id)])
 
 
 class Answer(models.Model):
@@ -37,6 +47,7 @@ class Answer(models.Model):
     answer = models.TextField(help_text="Enter your answer")
     contributor = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.IntegerField(default=0, help_text="Rate the answer")
+    date = models.DateTimeField('date published', default=timezone.localtime)
 
     def __str__(self):
         return "{}...".format(self.answer[0:10])

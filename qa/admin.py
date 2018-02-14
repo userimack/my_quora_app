@@ -4,6 +4,27 @@ from django.contrib import admin
 
 from qa.models import Question, Answer, Category
 
-admin.site.register(Question)
-admin.site.register(Answer)
+
+class AnswerInline(admin.TabularInline):
+    model = Answer
+    extra = 2
+
+
+class QuestionAdmin(admin.ModelAdmin):  # version - 2
+    fieldsets = [
+        (None, {'fields': ['subject']}),
+        ('Other Info', {'fields': ['rating', 'category', 'date']}),
+    ]
+
+    inlines = [AnswerInline]
+
+    list_display = ('subject', 'rating', 'category', 'date')
+    list_filter = ['date']
+
+    search_fields = ['subject']
+
+
+admin.site.register(Question, QuestionAdmin)
 admin.site.register(Category)
+
+

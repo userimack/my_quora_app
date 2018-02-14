@@ -1,0 +1,31 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
+<a href="{% url 'qa:index' %}"><button>Home</button> </a>
+
+<h1>{{ question.subject }}</h1>
+<p>{{ question.description }}</p>
+
+<h4>Asked by: {{ question.contributor.get_username }} </h4>
+<div>
+{% if question.category %}
+<i>#{{ question.category.name }}</i>
+{% else %}
+<i>No category</i>
+
+{%endif%}
+</div>
+
+{% if question.answer_set.all %}
+
+    <h2>Answers</h2>
+    {% for answer in question.answer_set.all %}
+    <p>> {{ answer.answer }} by {{ answer.contributor.get_username }}</p>
+        <br />
+    {% endfor %}
+{% else %}
+<i>There is no answer available for this question</i>
+{%endif%}
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
