@@ -9,3 +9,7 @@ urlpatterns = [
     url(r'^question/(?P<pk>[0-9]+)/edit/$', views.QuestionEdit.as_view(), name='question_edit'),
     url(r'^question/(?P<pk>[0-9]+)/delete/$', views.QuestionDelete.as_view(), name='question_delete'),
 ]
+
+urlpatterns += [
+    url(r'^accounts/register/$', views.register, name='register'),
+]

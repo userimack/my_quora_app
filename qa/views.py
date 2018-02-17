@@ -1,8 +1,11 @@
-#  from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
-from .models import Question
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+
+from .models import Question
 
 
 class IndexView(generic.ListView):
@@ -42,3 +45,15 @@ class QuestionEdit(UpdateView):
 class QuestionDelete(DeleteView):
     model = Question
     success_url = reverse_lazy('qa:index')
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Account Created successfully.")
+            return redirect('login')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
