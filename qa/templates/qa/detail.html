@@ -1,31 +1,78 @@
+{% extends "base_generic.html" %}
+
+{% load bootstrap3 %}
+
 {% load static %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+{% block content %}
+    <h1>{{ question.subject }}</h1>
+    <p>{{ question.description }}</p>
 
-<a href="{% url 'qa:index' %}"><button>Home</button> </a>
+    <h4>Asked by: {{ question.contributor.get_username }} </h4>
 
-<h1>{{ question.subject }}</h1>
-<p>{{ question.description }}</p>
+    <div>
+        {% if question.category %}
+            <i>#{{ question.category.name }}</i>
+        {% else %}
+            <i>No category</i>
+        {%endif%}
+    </div>
+    <div>
+            {% if user.is_authenticated  %}
+                {% if user.id == question.contributor.id %}
 
-<h4>Asked by: {{ question.contributor.get_username }} </h4>
-<div>
-{% if question.category %}
-<i>#{{ question.category.name }}</i>
-{% else %}
-<i>No category</i>
+              <a href="{% url 'qa:question_edit' question.id %}">
+                <button type="" class="btn btn-primary">
+                    {# {% bootstrap_icon "arrow" %} #} Edit
+                </button>
+              </a>
 
-{%endif%}
-</div>
+              <a href="{% url 'qa:question_delete' question.id %}">
+                <button type="" class="btn btn-danger">
+                    {# {% bootstrap_icon "arrow" %} #} Delete
+                </button>
+              </a>
+                {% endif %}
+            {% endif %}
+            </div>
 
-{% if question.answer_set.all %}
+    {% if question.answer_set.all %}
+        <h2>Answers</h2>
+        {% for answer in question.answer_set.all %}
+            <p> > {{ answer.answer }} by {{ answer.contributor.get_username }}</p>
 
-    <h2>Answers</h2>
-    {% for answer in question.answer_set.all %}
-    <p>> {{ answer.answer }} by {{ answer.contributor.get_username }}</p>
-        <br />
-    {% endfor %}
-{% else %}
-<i>There is no answer available for this question</i>
-{%endif%}
+            {% if user.is_authenticated  %}
+                {% if user.id == answer.contributor.id %}
 
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+              <a href="{% url 'qa:answer_edit' answer.id %}">
+                <button type="" class="btn btn-primary">
+                    {# {% bootstrap_icon "arrow" %} #} Edit
+                </button>
+              </a>
+
+              <a href="{% url 'qa:answer_delete' answer.id %}">
+                <button type="" class="btn btn-danger">
+                    {# {% bootstrap_icon "arrow" %} #} Delete
+                </button>
+              </a>
+
+
+                {% endif %}
+            {% endif %}
+
+            <br />
+        {% endfor %}
+    {% else %}
+        <i>There is no answer available for this question</i>
+        {% if user.is_authenticated %}
+          {% buttons %}
+           <a href="{% url 'qa:new_answer' question.id %}">
+            <button type="submit" class="btn btn-default">
+                {# {% bootstrap_icon "arrow" %} #} Write an answer
+            </button>
+           </a>
+          {% endbuttons %}
+          {% endif %}
+
+    {%endif%}
+{% endblock %}

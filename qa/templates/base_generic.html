@@ -1,5 +1,8 @@
 {% load staticfiles %}
 
+{% load bootstrap3 %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,18 +10,23 @@
   <title>{% block title %}My Little Quora{% endblock %} </title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+{# Load the tag library #}
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 
   <!-- Add additional CSS in static file -->
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <!-- <link rel="stylesheet" href="{% static 'qa/style.css' %}"> -->
+
 </head>
 
 <body>
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
 
   <div class="container-fluid">
 
@@ -27,15 +35,19 @@
         {% block sidebar %}
           <ul class="sidebar-nav">
               <li><a href="{% url 'qa:index' %}">Home</a></li>
+              {% if user.is_authenticated %}
+              <li><a href="{% url 'qa:new_question' %}">Ask Question</a></li>
+
+              <li><a href="{% url 'logout' %}">Logout</a></li>
+              {% else %}
+              <li><a href="{% url 'login' %}">Login</a></li>
+              <li><a href="{% url 'register' %}">Sign Up</a></li>
+              {% endif %}
           </ul>
         {% endblock %}
       </div>
-    </div>
-    </div>
 
-
-  <div class="container content">
-      <div class="col-sm-10 ">
+      <div class="col-sm-10">
         {% block content %}
         {% endblock %}
 
@@ -44,19 +56,20 @@
               <div class="pagination">
                   <span class="page-links">
                       {% if page_obj.has_previous %}
-                          <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
+                      <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}"> <button class="btn btn-default">previous</button></a>
                       {% endif %}
                       <span class="page-current">
                           Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
                       </span>
                       {% if page_obj.has_next %}
-                          <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
+                      <a href="{{ request.path }}?page={{ page_obj.next_page_number }}"> <button class="btn btn-default">next</button></a>
                       {% endif %}
                   </span>
               </div>
           {% endif %}
         {% endblock %}
+      </div>
     </div>
-
+    </div>
 </body>
 </html>

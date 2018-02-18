@@ -20,6 +20,8 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 
+from qa import views
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -29,6 +31,10 @@ urlpatterns = [
 
 urlpatterns += [
     url('^accounts/', include('django.contrib.auth.urls')),
+]
+
+urlpatterns += [
+    url(r'^accounts/register/$', views.register, name='register'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

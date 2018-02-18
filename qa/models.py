@@ -36,7 +36,7 @@ class Question(models.Model):
         """
         Returns the url of the detailed page for the question
         """
-        return reverse('qa:answer', args=[str(self.id)])
+        return reverse('qa:answers', args=[str(self.id)])
 
 
 class Answer(models.Model):
@@ -50,4 +50,4 @@ class Answer(models.Model):
     date = models.DateTimeField('date published', default=timezone.localtime)
 
     def __str__(self):
-        return "{}...".format(self.answer[0:10])
+        return self.answer[0:20]

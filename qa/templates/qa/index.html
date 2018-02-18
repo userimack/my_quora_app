@@ -1,40 +1,39 @@
+{% extends "base_generic.html" %}
 {% load static %}
+{% load bootstrap3 %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+{% block content %}
 
-{% if question_list %}
-    {% for question in question_list %}
-    <div>
-        <h3><a href="{% url 'qa:answer' question.id %} ">{{ question.subject }}</a></h3>
-        <h4>Asked by: {{ question.contributor.get_username }} </h4>
-        <h5>Total answers: {{ question.answer_set.all.count }}</h5>
-        {% for answer in question.answer_set.all %}
-            <p>{% if forloop.last %} {{answer.answer}}  {% endif %}</p>
+    {% if question_list %}
+        {% for question in question_list %}
+            <h3><a href="{% url 'qa:answers' question.id %}">{{ question.subject }}</a> </h3>
+            {% if user.is_authenticated  %}
+                {% if user.id == question.contributor.id %}
+
+              <a href="{% url 'qa:question_edit' question.id %}">
+                <button type="" class="btn btn-primary">
+                    {# {% bootstrap_icon "arrow" %} #} Edit
+                </button>
+              </a>
+
+              <a href="{% url 'qa:question_delete' question.id %}">
+                <button type="" class="btn btn-danger">
+                    {# {% bootstrap_icon "arrow" %} #} Delete
+                </button>
+              </a>
+
+
+                {% endif %}
+            {% endif %}
+
+            <h4>Asked by: {{ question.contributor.get_username }} </h4>
+            <i><h5>Total answers: {{ question.answer_set.all.count }}</h5></i>
+            {% for answer in question.answer_set.all %} <p>{% if forloop.last %} {{answer.answer}}
+                {% endif %}</p>
+            {% endfor %}
         {% endfor %}
-    </div>
-    {% endfor %}
 
-
-      <div class="col-sm-10 ">
-      {% block content %}{% endblock %}
-        {% block pagination %}
-          {% if is_paginated %}
-              <div class="pagination">
-                  <span class="page-links">
-                      {% if page_obj.has_previous %}
-                          <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">previous</a>
-                      {% endif %}
-                      <span class="page-current">
-                          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                      </span>
-                      {% if page_obj.has_next %}
-                          <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">next</a>
-                      {% endif %}
-                  </span>
-              </div>
-          {% endif %}
-        {% endblock %}
-      </div>
-{% else %}
-    <p>No questions are available.</p>
-{% endif %}
+    {% else %}
+        <p>No questions are available.</p>
+    {% endif %}
+{% endblock %}
