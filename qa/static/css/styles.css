@@ -1,0 +1,67 @@
+.vote-up {
+  display: inline-block;
+  overflow: hidden;
+  width: 40px;
+  height: 25px;
+  cursor: pointer;
+  background: url('../images/up_arrow.png');
+  background-position: 0 -25px;
+}
+
+.vote-down {
+  display: inline-block;
+  overflow: hidden;
+  width: 40px;
+  height: 25px;
+  cursor: pointer;
+  background: url('../images/down_arrow.png');
+  background-position: 0 -55px;
+}
+
+.vote-up.on {
+  background-position: 0 2px;
+}
+
+.vote-down.on {
+  background-position: 0 23px;
+}
+
+.disabled{
+    pointer-events: none;
+    /* display: none; */
+}
+/* .arrow-up { */
+/*   width: 0; */
+/*   height: 0; */
+/*   border-left: 5px solid transparent; */
+/*   border-right: 5px solid transparent; */
+/*  */
+/*   border-bottom: 5px solid black; */
+/* } */
+/*  */
+/* .arrow-down { */
+/*   width: 0; */
+/*   height: 0; */
+/*   border-left: 20px solid transparent; */
+/*   border-right: 20px solid transparent; */
+/*  */
+/*   border-top: 20px solid #f00; */
+/* } */
+/*  */
+/* .arrow-right { */
+/*   width: 0; */
+/*   height: 0; */
+/*   border-top: 60px solid transparent; */
+/*   border-bottom: 60px solid transparent; */
+/*  */
+/*   border-left: 60px solid green; */
+/* } */
+/*  */
+/* .arrow-left { */
+/*   width: 0; */
+/*   height: 0; */
+/*   border-top: 10px solid transparent; */
+/*   border-bottom: 10px solid transparent; */
+/*  */
+/*   border-right:10px solid blue; */
+/* } */

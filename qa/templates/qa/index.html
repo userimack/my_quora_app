@@ -24,6 +24,7 @@
 
 
                 {% endif %}
+                Click to vote: <span class="vote-up"> </span> <span class="vote-down"> </span>
             {% endif %}
 
             <h4>Asked by: {{ question.contributor.get_username }} </h4>
@@ -36,4 +37,16 @@
     {% else %}
         <p>No questions are available.</p>
     {% endif %}
+
+    <script>
+    $('.vote-up').click(function () {
+      $(this).toggleClass('on');
+      <!-- $('.vote-up').unbind("click"); -->
+      <!-- $('.vote-down').unbind("click"); -->
+    });
+    $('.vote-down').click(function () {
+      $(this).toggleClass('on');
+    });
+
+    </script>
 {% endblock %}

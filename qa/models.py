@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 #  from datetime import datetime
 from django.utils import timezone
-from django.urls import reverse  # Used to generate URLs by reversing the URL patterns
+#  from django.urls import reverse  # Used to generate URLs by reversing the URL patterns
 
 
 class Category(models.Model):
@@ -31,12 +31,6 @@ class Question(models.Model):
 
     def __str__(self):
         return self.subject
-
-    def get_absolute_url(self):
-        """
-        Returns the url of the detailed page for the question
-        """
-        return reverse('qa:answers', args=[str(self.id)])
 
 
 class Answer(models.Model):
