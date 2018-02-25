@@ -5,6 +5,7 @@
 {% load static %}
 
 {% block content %}
+
     <h1>{{ question.subject }}</h1>
     <p>{{ question.description }}</p>
 
@@ -18,6 +19,7 @@
         {%endif%}
     </div>
     <div>
+        <div class="col-sm-12">
             {% if user.is_authenticated  %}
                 {% if user.id == question.contributor.id %}
 
@@ -33,6 +35,46 @@
                 </button>
               </a>
                 {% endif %}
+
+                <div class="col-sm-2">
+                {% if user in question_upvoted_users %}
+                    <div class="btn-disable btn-default">
+
+                {% else %}
+                    <div>
+                {% endif %}
+                    <form method="post" action="{% url 'qa:question_vote' question.id %}">
+                        {% csrf_token %}
+                          {% buttons %}
+                          <button type="submit" class="btn" name="upvote">
+                                {# {% bootstrap_icon "arrow" %} #} Upvote
+                            </button>
+                          {% endbuttons %}
+                    </form>
+                </div>
+                                Total upvotes: {{question_upvotes}}
+                </div>
+
+                <div class="col-sm-2">
+                {% if user in question_downvoted_users %}
+                <div class="btn-disable btn-default">
+                {% else %}
+                <div>
+                {% endif %}
+
+
+                <form method="post" action="{% url 'qa:question_vote' question.id %}">
+                    {% csrf_token %}
+                      {% buttons %}
+                        <button type="submit" class="btn" name="downvote">
+                            {# {% bootstrap_icon "arrow" %} #} Downvote
+                        </button>
+                      {% endbuttons %}
+                </form>
+                    </div>
+                Total downvotes: {{ question_downvotes }}
+                </div>
+            </form>
             {% endif %}
             </div>
 
@@ -44,6 +86,7 @@
             {% if user.is_authenticated  %}
                 {% if user.id == answer.contributor.id %}
 
+            <div>
               <a href="{% url 'qa:answer_edit' answer.id %}">
                 <button type="" class="btn btn-primary">
                     {# {% bootstrap_icon "arrow" %} #} Edit
@@ -56,11 +99,57 @@
                 </button>
               </a>
 
+                </div>
 
                 {% endif %}
-            {% endif %}
 
-            <br />
+                <br/>
+                <!-- {% comment %}
+            <div class="col-sm-12">
+                <div class="col-sm-2">
+                {% if user in answer_upvoted_users %}
+                    <div class="btn-disable btn-default">
+
+                {% else %}
+                    <div>
+                {% endif %}
+                    <form method="post" action="{% url 'qa:answer_vote' answer.id %}">
+                        {% csrf_token %}
+                          {% buttons %}
+                          <button type="submit" class="btn" name="upvote">
+                                {# {% bootstrap_icon "arrow" %} #} Upvote
+                            </button>
+                          {% endbuttons %}
+                    </form>
+                </div>
+                        Upvotes:
+                </div>
+
+                <div class="col-sm-2">
+                {% if user in answer_downvoted_users %}
+                <div class="btn-disable btn-default">
+                {% else %}
+                <div>
+                {% endif %}
+
+                <form method="post" action="{% url 'qa:answer_vote' answer.id %}">
+                    {% csrf_token %}
+                      {% buttons %}
+                        <button type="submit" class="btn" name="downvote">
+                            {# {% bootstrap_icon "arrow" %} #} Downvote
+                        </button>
+                      {% endbuttons %}
+                </form>
+                    </div>
+                Downvotes:
+                </div>
+            </form>
+                </div>
+
+
+            <br />  {% endcomment %} -->
+
+            {% endif %}
         {% endfor %}
     {% else %}
         <i>There is no answer available for this question</i>
@@ -75,4 +164,6 @@
           {% endif %}
 
     {%endif%}
+    </div>
+
 {% endblock %}

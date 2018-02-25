@@ -22,7 +22,7 @@
 
 from django import forms
 
-from .models import Question, Answer
+from .models import Question, Answer, RateQuestion
 
 
 class QuestionForm(forms.ModelForm):
@@ -37,3 +37,9 @@ class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
         fields = ('answer',)
+
+
+class RateQuestionForm(forms.ModelForm):
+    class Meta:
+        model = RateQuestion
+        fields = ('rating',)
