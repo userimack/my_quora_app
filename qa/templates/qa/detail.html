@@ -5,6 +5,7 @@
 {% load static %}
 
 {% block content %}
+
     <h1>{{ question.subject }}</h1>
     <p>{{ question.description }}</p>
 
@@ -18,6 +19,7 @@
         {%endif%}
     </div>
     <div>
+        <div class="col-sm-12">
             {% if user.is_authenticated  %}
                 {% if user.id == question.contributor.id %}
 
@@ -33,8 +35,51 @@
                 </button>
               </a>
                 {% endif %}
+                </div>
+
+        <div class="col-sm-12">
+                <div class="col-sm-2">
+                    {% if user in question.upvoted_by_users.all %}
+                    <div class="btn-disable btn-default">
+
+                {% else %}
+                    <div>
+                {% endif %}
+                    <form method="post" action="{% url 'qa:question_vote' question.id %}">
+                        {% csrf_token %}
+                          {% buttons %}
+                          <button type="submit" class="btn" name="upvote">
+                                {# {% bootstrap_icon "arrow" %} #} Upvote
+                            </button>
+                          {% endbuttons %}
+                    </form>
+                </div>
+                </div>
+
+                <div class="col-sm-2">
+                {% if user in question.downvoted_by_users.all %}
+                <div class="btn-disable btn-default">
+                {% else %}
+                <div>
+                {% endif %}
+
+
+                <form method="post" action="{% url 'qa:question_vote' question.id %}">
+                    {% csrf_token %}
+                      {% buttons %}
+                        <button type="submit" class="btn" name="downvote">
+                            {# {% bootstrap_icon "arrow" %} #} Downvote
+                        </button>
+                      {% endbuttons %}
+                </form>
+                    </div>
+                </div>
+            </form>
             {% endif %}
             </div>
+                Upvotes: {{question.total_upvotes}}
+
+                Downvotes: {{ question.total_downvotes }}
 
     {% if question.answer_set.all %}
         <h2>Answers</h2>
@@ -44,6 +89,7 @@
             {% if user.is_authenticated  %}
                 {% if user.id == answer.contributor.id %}
 
+            <div>
               <a href="{% url 'qa:answer_edit' answer.id %}">
                 <button type="" class="btn btn-primary">
                     {# {% bootstrap_icon "arrow" %} #} Edit
@@ -56,11 +102,57 @@
                 </button>
               </a>
 
+                </div>
 
                 {% endif %}
-            {% endif %}
+
+                <br/>
+            <div class="col-sm-12">
+                <div class="col-sm-2">
+                    {% if user in answer.upvoted_by_users.all %}
+                    <div class="btn-disable btn-default">
+
+                {% else %}
+                    <div>
+                {% endif %}
+                    <form method="post" action="{% url 'qa:answer_vote' answer.id %}">
+                        {% csrf_token %}
+                          {% buttons %}
+                          <button type="submit" class="btn" name="upvote">
+                                {# {% bootstrap_icon "arrow" %} #} Upvote
+                            </button>
+                          {% endbuttons %}
+                    </form>
+                </div>
+                </div>
+
+                <div class="col-sm-2">
+                {% if user in answer.downvoted_by_users.all %}
+                <div class="btn-disable btn-default">
+                {% else %}
+                <div>
+                {% endif %}
+
+                <form method="post" action="{% url 'qa:answer_vote' answer.id %}">
+                    {% csrf_token %}
+                      {% buttons %}
+                        <button type="submit" class="btn" name="downvote">
+                            {# {% bootstrap_icon "arrow" %} #} Downvote
+                        </button>
+                      {% endbuttons %}
+                </form>
+                    </div>
+                </div>
+            </form>
+                </div>
+
 
             <br />
+
+            {% endif %}
+                Upvotes: {{ answer.total_upvotes }}
+
+                Downvotes: {{answer.total_downvotes}}
         {% endfor %}
     {% else %}
         <i>There is no answer available for this question</i>
@@ -75,4 +167,6 @@
           {% endif %}
 
     {%endif%}
+    </div>
+
 {% endblock %}

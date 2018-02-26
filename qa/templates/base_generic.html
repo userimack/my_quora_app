@@ -39,7 +39,7 @@
               {% if user.is_authenticated %}
               <li><a href="{% url 'qa:new_question' %}">Ask Question</a></li>
 
-              <li><a href="{% url 'logout' %}">Logout</a></li>
+              <li><a href="{% url 'logout' %}">Logout @{{user.username}}</a></li>
               {% else %}
               <li><a href="{% url 'login' %}">Login</a></li>
               <li><a href="{% url 'register' %}">Sign Up</a></li>

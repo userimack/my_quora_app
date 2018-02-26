@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^answer/(?P<pk>[0-9]+)/new/$', views.new_answer, name='new_answer'),
     url(r'^answer/(?P<pk>[0-9]+)/edit/$', views.answer_edit, name='answer_edit'),
     url(r'^answer/(?P<pk>[0-9]+)/delete/$', views.answer_delete, name='answer_delete'),
+    url(r'^question/(?P<pk>[0-9]+)/vote/$', views.question_vote, name='question_vote'),
+    url(r'^answer/(?P<pk>[0-9]+)/vote/$', views.answer_vote, name='answer_vote'),
 ]
-
 

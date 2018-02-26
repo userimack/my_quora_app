@@ -24,8 +24,10 @@
 
 
                 {% endif %}
-                Click to vote: <span class="vote-up"> </span> <span class="vote-down"> </span>
             {% endif %}
+
+            Upvotes: {{question.total_upvotes}}
+            Downvotes: {{question.total_downvotes}}
 
             <h4>Asked by: {{ question.contributor.get_username }} </h4>
             <i><h5>Total answers: {{ question.answer_set.all.count }}</h5></i>
