@@ -35,9 +35,11 @@
                 </button>
               </a>
                 {% endif %}
+                </div>
 
+        <div class="col-sm-12">
                 <div class="col-sm-2">
-                {% if user in question_upvoted_users %}
+                    {% if user in question.upvoted_by_users.all %}
                     <div class="btn-disable btn-default">
 
                 {% else %}
@@ -52,11 +54,10 @@
                           {% endbuttons %}
                     </form>
                 </div>
-                                Total upvotes: {{question_upvotes}}
                 </div>
 
                 <div class="col-sm-2">
-                {% if user in question_downvoted_users %}
+                {% if user in question.downvoted_by_users.all %}
                 <div class="btn-disable btn-default">
                 {% else %}
                 <div>
@@ -72,11 +73,13 @@
                       {% endbuttons %}
                 </form>
                     </div>
-                Total downvotes: {{ question_downvotes }}
                 </div>
             </form>
             {% endif %}
             </div>
+                Upvotes: {{question.total_upvotes}}
+
+                Downvotes: {{ question.total_downvotes }}
 
     {% if question.answer_set.all %}
         <h2>Answers</h2>
@@ -104,10 +107,9 @@
                 {% endif %}
 
                 <br/>
-                <!-- {% comment %}
             <div class="col-sm-12">
                 <div class="col-sm-2">
-                {% if user in answer_upvoted_users %}
+                    {% if user in answer.upvoted_by_users.all %}
                     <div class="btn-disable btn-default">
 
                 {% else %}
@@ -122,11 +124,10 @@
                           {% endbuttons %}
                     </form>
                 </div>
-                        Upvotes:
                 </div>
 
                 <div class="col-sm-2">
-                {% if user in answer_downvoted_users %}
+                {% if user in answer.downvoted_by_users.all %}
                 <div class="btn-disable btn-default">
                 {% else %}
                 <div>
@@ -141,15 +142,17 @@
                       {% endbuttons %}
                 </form>
                     </div>
-                Downvotes:
                 </div>
             </form>
                 </div>
 
 
-            <br />  {% endcomment %} -->
+            <br />
 
             {% endif %}
+                Upvotes: {{ answer.total_upvotes }}
+
+                Downvotes: {{answer.total_downvotes}}
         {% endfor %}
     {% else %}
         <i>There is no answer available for this question</i>
