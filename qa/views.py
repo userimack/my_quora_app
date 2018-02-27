@@ -19,11 +19,6 @@ class IndexView(generic.ListView):
     context_object_name = 'question_list'
     paginate_by = 6
 
-    #  def get_context_data(self, **kwargs):
-    #      context = super(IndexView, self).get_context_data(**kwargs)
-    #      context['question_rating'] = RateQuestion.objects.filter(question=self.Question)
-    #      return context
-
 
 class DetailView(generic.DetailView):
     model = Question
@@ -31,14 +26,6 @@ class DetailView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
-        #  print(context)
-        #  upvoted_questions = RateQuestion.objects.filter(question=context["question"], rating=True)
-        #  downvoted_question = RateQuestion.objects.filter(question=context["question"], rating=False)
-        #  context['question_upvotes'] = upvoted_questions.count()
-        #  context['question_upvoted_users'] = [rate_obj.user for rate_obj in upvoted_questions]
-        #  context['question_downvotes'] = downvoted_question.count()
-        #  context['question_downvoted_users'] = [rate_obj.user for rate_obj in downvoted_question]
-
         return context
 
 
@@ -75,7 +62,6 @@ def question_edit(request, pk):
     print(question)
     if question.contributor != request.user:
         raise PermissionDenied(u"You don't have permission to edit this.")
-    #  if request.user
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
         if form.is_valid():
@@ -144,6 +130,28 @@ def new_answer(request, pk):
     return render(request, 'qa/answer_form.html', {'form': form, 'question': question})
 
 
+def remove_vote(object_name, upvote, user_obj):
+    #  print("--remove--", object_name, upvote, user_obj)
+    if upvote:
+        object_name.total_upvotes -= 1
+        object_name.upvoted_by_users.remove(user_obj)
+    else:
+        object_name.total_downvotes -= 1
+        object_name.downvoted_by_users.remove(user_obj)
+    object_name.save()
+
+
+def add_vote(object_name, upvote, user_obj):
+    #  print("--add--", object_name, upvote, user_obj)
+    if upvote:
+        object_name.total_upvotes += 1
+        object_name.upvoted_by_users.add(user_obj)
+    else:
+        object_name.total_downvotes += 1
+        object_name.downvoted_by_users.add(user_obj)
+    object_name.save()
+
+
 @login_required
 def question_vote(request, pk):
     question = get_object_or_404(Question, pk=pk)
@@ -151,33 +159,24 @@ def question_vote(request, pk):
     if request.method == 'POST':
         vote = True if "upvote" in request.POST else False
         user = request.user
-        #  rated_question = RateQuestion.objects.filter(question=question, user=user)
-        #  print("----->>", question.upvoted_by_users.all())
 
         if vote:
             if user in question.downvoted_by_users.all():
-                question.total_downvotes -= 1
-                question.downvoted_by_users.remove(user)
+                remove_vote(question, False, user)
 
             if user in question.upvoted_by_users.all():
-                question.total_upvotes -= 1
-                question.upvoted_by_users.remove(user)
+                remove_vote(question, True, user)
             else:
-                question.total_upvotes += 1
-                question.upvoted_by_users.add(user)
+                add_vote(question, True, user)
         else:
             if user in question.upvoted_by_users.all():
-                question.total_upvotes -= 1
-                question.upvoted_by_users.remove(user)
+                remove_vote(question, True, user)
 
             if user in question.downvoted_by_users.all():
-                question.total_downvotes -= 1
-                question.downvoted_by_users.remove(user)
+                remove_vote(question, False, user)
             else:
-                question.total_downvotes += 1
-                question.downvoted_by_users.add(user)
+                add_vote(question, False, user)
 
-        question.save()
     return redirect('qa:answers', pk=pk)
 
 
@@ -188,37 +187,21 @@ def answer_vote(request, pk):
     if request.method == 'POST':
         vote = True if "upvote" in request.POST else False
         user = request.user
-        #  rated_question = RateQuestion.objects.filter(question=question, user=user)
-
-        #  print("----->>", answer.upvoted_by_users.all())
 
         if vote:
             if user in answer.downvoted_by_users.all():
-                answer.total_downvotes -= 1
-                answer.downvoted_by_users.remove(user)
-                answer.save()
-                #  return HttpResponse("You have already downvoted")
+                remove_vote(answer, False, user)
 
             if user in answer.upvoted_by_users.all():
-                answer.total_upvotes -= 1
-                answer.upvoted_by_users.remove(user)
-                answer.save()
+                remove_vote(answer, True, user)
             else:
-                answer.total_upvotes += 1
-                answer.upvoted_by_users.add(user)
-                answer.save()
+                add_vote(answer, True, user)
         else:
             if user in answer.upvoted_by_users.all():
-                answer.total_upvotes -= 1
-                answer.upvoted_by_users.remove(user)
-                answer.save()
+                remove_vote(answer, True, user)
             if user in answer.downvoted_by_users.all():
-                answer.total_downvotes -= 1
-                answer.downvoted_by_users.remove(user)
-                answer.save()
+                remove_vote(answer, False, user)
             else:
-                answer.total_downvotes += 1
-                answer.downvoted_by_users.add(user)
-                answer.save()
+                add_vote(answer, False, user)
 
-    return redirect('qa:answers', pk=pk)
+    return redirect('qa:answers', pk=answer.question.id)

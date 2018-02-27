@@ -39,16 +39,4 @@
     {% else %}
         <p>No questions are available.</p>
     {% endif %}
-
-    <script>
-    $('.vote-up').click(function () {
-      $(this).toggleClass('on');
-      <!-- $('.vote-up').unbind("click"); -->
-      <!-- $('.vote-down').unbind("click"); -->
-    });
-    $('.vote-down').click(function () {
-      $(this).toggleClass('on');
-    });
-
-    </script>
 {% endblock %}
