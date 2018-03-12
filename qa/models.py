@@ -31,6 +31,8 @@ class Question(models.Model):
     total_downvotes = models.IntegerField(default=0, help_text="Total downvotes")
     downvoted_by_users = models.ManyToManyField(User, related_name="question_downvoted_by_users")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, help_text="Choose category")
+    # TODO: created_at and updated_at
+    # you update only updated_at field everytime there is an update
     date = models.DateTimeField('date published', default=timezone.localtime)
 
     def __str__(self):
@@ -58,3 +60,27 @@ class Answer(models.Model):
 
     class Meta:
         ordering = ["-date"]
+
+
+# refer: http://web.archive.org/web/20090227074910/http://thisweekindjango.com/articles/2008/jun/17/abstract-base-classes-vs-model-tab/
+class Vote(models.Model):
+    type
+    upvote
+    downvote
+    question_id
+    answer_id
+    pass
+
+
+class QuestionVote(Vote):
+    question_id = FK
+
+    def upvote():
+        pass
+
+    def downvote():
+        pass
+
+class AnswerVote(Vote):
+    answer_id = FK
+

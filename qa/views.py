@@ -58,10 +58,13 @@ def question_new(request):
 
 @login_required
 def question_edit(request, pk):
+    # TODO: add contributor condition
     question = get_object_or_404(Question, pk=pk)
     print(question)
+
     if question.contributor != request.user:
         raise PermissionDenied(u"You don't have permission to edit this.")
+
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
         if form.is_valid():
@@ -85,6 +88,7 @@ def answer_edit(request, pk):
         form = AnswerForm(request.POST, instance=answer)
         if form.is_valid():
             answer = form.save(commit=False)
+            # TODO: updating question id
             answer.question_id = pk
             answer.contributor = request.user
             answer.date = timezone.now()
@@ -130,6 +134,12 @@ def new_answer(request, pk):
     return render(request, 'qa/answer_form.html', {'form': form, 'question': question})
 
 
+# TODO move these methods to helpers.py or utils.py
+'''
+upvote
+check if user has upvoted previously.
+if he didn't
+'''
 def remove_vote(object_name, upvote, user_obj):
     #  print("--remove--", object_name, upvote, user_obj)
     if upvote:
@@ -152,30 +162,61 @@ def add_vote(object_name, upvote, user_obj):
     object_name.save()
 
 
+'''
+case 1: upvote
+
+case 2: downvote
+
+case 3: previously upvoted and now you want to downvote.
+
+case 4: previously downvoted and now you want to upvote.
+'''
+
+'''
+question:
+    upvote
+    downvote
+
+
+    upvote ->
+     disabling upvote
+     enable downvote
+
+    downvote -> 
+'''
+
+# TODO: refactor this.
 @login_required
 def question_vote(request, pk):
     question = get_object_or_404(Question, pk=pk)
 
     if request.method == 'POST':
-        vote = True if "upvote" in request.POST else False
+        upvote = True if "upvote" in request.POST else False
         user = request.user
 
-        if vote:
-            if user in question.downvoted_by_users.all():
-                remove_vote(question, False, user)
+        reset_user_question_votes_to_zero(question, user)
+        if upvote:
+            # just remove both votes
+            # reset to zero
+            # upvote_question(question, user)
+            question.upvote()
+            # if user in question.downvoted_by_users.all():
+                # remove_vote(question, False, user)
 
-            if user in question.upvoted_by_users.all():
-                remove_vote(question, True, user)
-            else:
-                add_vote(question, True, user)
+            # if user in question.upvoted_by_users.all():
+                # remove_vote(question, True, user)
+            # else:
+                # add_vote(question, True, user)
         else:
-            if user in question.upvoted_by_users.all():
-                remove_vote(question, True, user)
+            question.downvote()
+            downvote_question(question, user)
+            # if user in question.upvoted_by_users.all():
+                # remove_vote(question, True, user)
 
-            if user in question.downvoted_by_users.all():
-                remove_vote(question, False, user)
-            else:
-                add_vote(question, False, user)
+            # if user in question.downvoted_by_users.all():
+                # remove_vote(question, False, user)
+            # else:
+                # add_vote(question, False, user)
 
     return redirect('qa:answers', pk=pk)
 
