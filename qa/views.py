@@ -6,11 +6,15 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.core.exceptions import PermissionDenied
+#  from django.core.exceptions import PermissionDenied
 #  from django.http import HttpResponse
+import logging
 
 from .models import Question, Answer  # , RateQuestion, RateAnswer
 from .forms import QuestionForm, AnswerForm
+
+
+logger = logging.getLogger(__name__)
 
 
 class IndexView(generic.ListView):
@@ -48,7 +52,8 @@ def question_new(request):
         if form.is_valid():
             question = form.save(commit=False)
             question.contributor = request.user
-            question.date = timezone.now()
+            question.created_at = timezone.now()
+            question.updated_at = timezone.now()
             question.save()
             return redirect('qa:answers', pk=question.pk)
     else:
@@ -58,16 +63,15 @@ def question_new(request):
 
 @login_required
 def question_edit(request, pk):
-    question = get_object_or_404(Question, pk=pk)
-    print(question)
-    if question.contributor != request.user:
-        raise PermissionDenied(u"You don't have permission to edit this.")
+    question = get_object_or_404(Question, pk=pk, contributor=request.user)
+    logger.info(question)
+    #  if question.contributor != request.user:
+    #      raise PermissionDenied(u"You don't have permission to edit this.")
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
         if form.is_valid():
             question = form.save(commit=False)
-            question.contributor = request.user
-            question.date = timezone.now()
+            question.updated_at = timezone.now()
             question.save()
             return redirect('qa:answers', pk=question.pk)
     else:
@@ -77,17 +81,15 @@ def question_edit(request, pk):
 
 @login_required
 def answer_edit(request, pk):
-    answer = get_object_or_404(Answer, pk=pk)
-    if answer.contributor != request.user:
-        raise PermissionDenied(u"You don't have permission to edit this.")
+    answer = get_object_or_404(Answer, pk=pk, contributor=request.user)
+    #  if answer.contributor != request.user:
+    #      raise PermissionDenied(u"You don't have permission to edit this.")
 
     if request.method == 'POST':
         form = AnswerForm(request.POST, instance=answer)
         if form.is_valid():
             answer = form.save(commit=False)
-            answer.question_id = pk
-            answer.contributor = request.user
-            answer.date = timezone.now()
+            answer.updated_at = timezone.now()
             answer.save()
             return redirect('qa:answers', pk=answer.question.id)
     else:
@@ -97,24 +99,25 @@ def answer_edit(request, pk):
 
 @login_required
 def question_delete(request, pk):
-    question = get_object_or_404(Question, pk=pk)
-    if question.contributor != request.user:
-        raise PermissionDenied(u"You don't have permission to delete this.")
+    question = get_object_or_404(Question, pk=pk, contributor=request.user)
+    #  if question.contributor != request.user:
+    #      raise PermissionDenied(u"You don't have permission to delete this.")
     question.delete()
     return redirect('qa:index')
 
 
 @login_required
 def answer_delete(request, pk):
-    answer = get_object_or_404(Answer, pk=pk)
-    if answer.contributor != request.user:
-        raise PermissionDenied(u"You don't have permission to delete this.")
+    answer = get_object_or_404(Answer, pk=pk, contributor=request.user)
+    #  if answer.contributor != request.user:
+    #      raise PermissionDenied(u"You don't have permission to delete this.")
     answer.delete()
     return redirect('qa:answers', pk=answer.question.id)
 
 
 @login_required
 def new_answer(request, pk):
+    #  import pdb;pdb.set_trace()
     question = Question.objects.get(pk=pk)
     if request.method == 'POST':
         form = AnswerForm(request.POST)
@@ -122,7 +125,8 @@ def new_answer(request, pk):
             answer = form.save(commit=False)
             answer.question_id = pk
             answer.contributor = request.user
-            answer.date = timezone.now()
+            answer.created_at = timezone.now()
+            answer.updated_at = timezone.now()
             answer.save()
             return redirect('qa:answers', pk=question.pk)
     else:
@@ -130,52 +134,23 @@ def new_answer(request, pk):
     return render(request, 'qa/answer_form.html', {'form': form, 'question': question})
 
 
-def remove_vote(object_name, upvote, user_obj):
-    #  print("--remove--", object_name, upvote, user_obj)
-    if upvote:
-        object_name.total_upvotes -= 1
-        object_name.upvoted_by_users.remove(user_obj)
-    else:
-        object_name.total_downvotes -= 1
-        object_name.downvoted_by_users.remove(user_obj)
-    object_name.save()
-
-
-def add_vote(object_name, upvote, user_obj):
-    #  print("--add--", object_name, upvote, user_obj)
-    if upvote:
-        object_name.total_upvotes += 1
-        object_name.upvoted_by_users.add(user_obj)
-    else:
-        object_name.total_downvotes += 1
-        object_name.downvoted_by_users.add(user_obj)
-    object_name.save()
-
-
 @login_required
 def question_vote(request, pk):
     question = get_object_or_404(Question, pk=pk)
-
     if request.method == 'POST':
-        vote = True if "upvote" in request.POST else False
-        user = request.user
+        # Checking which button was clicked
+        upvote = True if "upvote" in request.POST else False
 
-        if vote:
-            if user in question.downvoted_by_users.all():
-                remove_vote(question, False, user)
-
-            if user in question.upvoted_by_users.all():
-                remove_vote(question, True, user)
-            else:
-                add_vote(question, True, user)
+        if upvote:
+            if not question.is_upvoted(request.user):
+                question.upvote(request.user)
+                if question.is_downvoted(request.user):
+                    question.remove_downvote(request.user)
         else:
-            if user in question.upvoted_by_users.all():
-                remove_vote(question, True, user)
-
-            if user in question.downvoted_by_users.all():
-                remove_vote(question, False, user)
-            else:
-                add_vote(question, False, user)
+            if not question.is_downvoted(request.user):
+                question.downvote(request.user)
+                if question.is_upvoted(request.user):
+                    question.remove_upvote(request.user)
 
     return redirect('qa:answers', pk=pk)
 
@@ -183,25 +158,19 @@ def question_vote(request, pk):
 @login_required
 def answer_vote(request, pk):
     answer = get_object_or_404(Answer, pk=pk)
-
     if request.method == 'POST':
-        vote = True if "upvote" in request.POST else False
-        user = request.user
+        # Checking which button was clicked
+        upvote = True if "upvote" in request.POST else False
 
-        if vote:
-            if user in answer.downvoted_by_users.all():
-                remove_vote(answer, False, user)
-
-            if user in answer.upvoted_by_users.all():
-                remove_vote(answer, True, user)
-            else:
-                add_vote(answer, True, user)
+        if upvote:
+            if not answer.is_upvoted(request.user):
+                answer.upvote(request.user)
+                if answer.is_downvoted(request.user):
+                    answer.remove_downvote(request.user)
         else:
-            if user in answer.upvoted_by_users.all():
-                remove_vote(answer, True, user)
-            if user in answer.downvoted_by_users.all():
-                remove_vote(answer, False, user)
-            else:
-                add_vote(answer, False, user)
+            if not answer.is_downvoted(request.user):
+                answer.downvote(request.user)
+                if answer.is_upvoted(request.user):
+                    answer.remove_upvote(request.user)
 
     return redirect('qa:answers', pk=answer.question.id)

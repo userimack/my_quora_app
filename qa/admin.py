@@ -13,13 +13,13 @@ class AnswerInline(admin.TabularInline):
 class QuestionAdmin(admin.ModelAdmin):  # version - 2
     fieldsets = [
         (None, {'fields': ['subject']}),
-        ('Other Info', {'fields': ['category', 'date']}),
+        ('Other Info', {'fields': ['category', 'created_at', 'updated_at']}),
     ]
 
     inlines = [AnswerInline]
 
-    list_display = ('subject', 'category', 'date')
-    list_filter = ['date']
+    list_display = ('subject', 'category', 'created_at', 'updated_at')
+    list_filter = ['created_at']
 
     search_fields = ['subject']
 
