@@ -58,14 +58,14 @@ class ContentBase(models.Model):
         self.total_downvotes -= 1
         self.save()
 
-    def is_upvoted(self, user):
+    def has_upvoted(self, user):
         try:
             user = self.upvoted_by_users.get(id=user.id)
             return True if user else False
         except ObjectDoesNotExist:
             return False
 
-    def is_downvoted(self, user):
+    def has_downvoted(self, user):
         try:
             user = self.downvoted_by_users.get(id=user.id)
             return True if user else False
