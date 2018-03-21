@@ -147,16 +147,8 @@ def question_vote(request, pk):
         # Checking which button was clicked
         upvote = True if "upvote" in request.POST else False
 
-        if upvote:
-            if not question.has_upvoted(request.user):
-                question.upvote(request.user)
-                if question.has_downvoted(request.user):
-                    question.remove_downvote(request.user)
-        else:
-            if not question.has_downvoted(request.user):
-                question.downvote(request.user)
-                if question.has_upvoted(request.user):
-                    question.remove_upvote(request.user)
+        if upvote: question.upvote(request.user)
+        else: question.downvote(request.user)
 
     return redirect('qa:answers', pk=pk)
 
@@ -168,15 +160,7 @@ def answer_vote(request, pk):
         # Checking which button was clicked
         upvote = True if "upvote" in request.POST else False
 
-        if upvote:
-            if not answer.has_upvoted(request.user):
-                answer.upvote(request.user)
-                if answer.has_downvoted(request.user):
-                    answer.remove_downvote(request.user)
-        else:
-            if not answer.has_downvoted(request.user):
-                answer.downvote(request.user)
-                if answer.has_upvoted(request.user):
-                    answer.remove_upvote(request.user)
+        if upvote: answer.upvote(request.user)
+        else: answer.downvote(request.user)
 
     return redirect('qa:answers', pk=answer.question.id)

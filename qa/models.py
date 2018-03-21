@@ -40,9 +40,12 @@ class ContentBase(models.Model):
 
     def upvote(self, user):
         # TODO move checking logic from views to models
-        self.upvoted_by_users.add(user)
-        self.total_upvotes += 1
-        self.save()
+        if not self.has_upvoted(user):
+            if self.has_downvoted(user):
+                self.remove_downvote(user)
+            self.upvoted_by_users.add(user)
+            self.total_upvotes += 1
+            self.save()
 
     def remove_upvote(self, user):
         self.upvoted_by_users.remove(user)
@@ -50,9 +53,12 @@ class ContentBase(models.Model):
         self.save()
 
     def downvote(self, user):
-        self.downvoted_by_users.add(user)
-        self.total_downvotes += 1
-        self.save()
+        if not self.has_downvoted(user):
+            if self.has_upvoted(user):
+                self.remove_upvote(user)
+            self.downvoted_by_users.add(user)
+            self.total_downvotes += 1
+            self.save()
 
     def remove_downvote(self, user):
         self.downvoted_by_users.remove(user)
