@@ -41,6 +41,7 @@ class TestDatabaseOperation():
         self.question.upvote(self.user)
         assert self.question.total_upvotes == 1
 
+    # TODO test for question upvotes count whhen a user has already upvoted
     def test_question_upvotes_count_when_a_user_upvotes_and_upvotes_are_present(self):
         self.user1 = User(username="test1", password="test123")
         self.user1.save()

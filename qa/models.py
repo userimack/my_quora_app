@@ -39,6 +39,7 @@ class ContentBase(models.Model):
         return self.answer[0:20]
 
     def upvote(self, user):
+        # TODO move checking logic from views to models
         self.upvoted_by_users.add(user)
         self.total_upvotes += 1
         self.save()
