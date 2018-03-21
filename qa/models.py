@@ -39,7 +39,6 @@ class ContentBase(models.Model):
         return self.answer[0:20]
 
     def upvote(self, user):
-        # TODO move checking logic from views to models
         if not self.has_upvoted(user):
             if self.has_downvoted(user):
                 self.remove_downvote(user)
@@ -95,9 +94,6 @@ class Question(ContentBase):
     def __str__(self):
         return self.subject
 
-    #  class Meta:
-    #      ordering = ["-updated_at"]
-
 
 class Answer(ContentBase):
     """
@@ -108,7 +104,3 @@ class Answer(ContentBase):
 
     def __str__(self):
         return self.answer[0:20]
-
-    #  class Meta:
-    #      ordering = ["-updated_at"]
-
