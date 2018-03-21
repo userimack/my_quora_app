@@ -7,7 +7,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 #  from django.core.exceptions import PermissionDenied
-#  from django.http import HttpResponse
+from django.http import HttpResponse
+#  from django.contrib.auth.decorators import user_passes_test
+
 import logging
 
 from .models import Question, Answer  # , RateQuestion, RateAnswer
@@ -33,15 +35,19 @@ class DetailView(generic.DetailView):
         return context
 
 
+#  @user_passes_test(lambda u: u.is_anonymous)
 def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Account Created successfully.")
-            return redirect('login')
+    if not request.user.is_authenticated():
+        if request.method == 'POST':
+            form = UserCreationForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Account Created successfully.")
+                return redirect('login')
+        else:
+            form = UserCreationForm()
     else:
-        form = UserCreationForm()
+        return HttpResponse("Sorry you are already logged in. To register log out and register a new account!!")
     return render(request, 'registration/register.html', {'form': form})
 
 
